@@ -1,0 +1,56 @@
+workflowExternalId: wf_icapi_data_pipeline
+version: '1'
+workflowDefinition:
+  tasks:
+  - externalId: create_asset_hierarchy_task1
+    type: transformation
+    parameters:
+      transformation:
+        externalId: create_asset_hierarchy
+    name: Create Asset Hierarchy
+    description: Create asset hierarchy in CDF based on the data model
+    retries: 3
+    timeout: 3600
+    onFailure: abortWorkflow
+
+  - externalId: contextualize_ts_assets_task2
+    type: transformation
+    parameters:
+      transformation:
+        externalId: contextualize_ts_assets
+    name: Contextualize Time Series Assets
+    description: Contextualize time series and assets in CDF based on the data model
+    retries: 3
+    timeout: 3600
+    onFailure: abortWorkflow
+    dependsOn:
+      - externalId: create_asset_hierarchy_task1
+
+  - externalId: icapi_datapoints_extractor_task3
+    type: function
+    parameters:
+      function:
+        externalId: icapi_datapoints_extractor
+        data: { "hours": 1 }
+    name: Extract ice cream API data points
+    description: Extract data points from the Ice Cream API and store them in CDF
+    retries: 3
+    timeout: 3600
+    onFailure: abortWorkflow
+    dependsOn:
+      - externalId: contextualize_ts_assets_task2
+
+
+  - externalId: oee_timeseries_task3
+    type: function
+    parameters:
+      function:
+        externalId: oee_timeseries
+        data: { "hours": 1 }
+    name: Calculate OEE Time Series
+    description: Calculate OEE time series based on the extracted data points and store them in C
+    retries: 3
+    timeout: 3600
+    onFailure: abortWorkflow
+    dependsOn:
+      - externalId: icapi_datapoints_extractor_task3

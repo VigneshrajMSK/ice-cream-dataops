@@ -33,7 +33,7 @@ modules:
   - name: oee
     location:
       path: modules/bootcamp/use_cases/oee
-      hash: f9e555c3
+      hash: 6d9995ce
     build_variables:
     - key: icapi_ds_external_id
       value: ds_icapi
@@ -78,6 +78,13 @@ modules:
           path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/use_cases/oee/functions/functions.Function.yaml
           hash: b4795e39
         kind: Function
+      - identifier:
+          functionExternalId: oee_timeseries
+          name: Run calculations every 5 minutes for last hour of data
+        source:
+          path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/use_cases/oee/functions/schedules.Schedule.yaml
+          hash: 0cc26f4c
+        kind: Schedule
       data_sets:
       - identifier:
           externalId: ds_uc_oee
@@ -98,7 +105,7 @@ modules:
   - name: ice_cream_api
     location:
       path: modules/bootcamp/ice_cream_api
-      hash: b503ce67
+      hash: c69db91a
     build_variables:
     - key: icapi_ds_external_id
       value: ds_icapi
@@ -170,6 +177,26 @@ modules:
           path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/raw/ice-cream-factory-db.Table.yaml
           hash: de947829
         kind: Database
+      workflows:
+      - identifier:
+          externalId: wf_icapi_data_pipeline
+        source:
+          path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/workflows/wf_icapi_data_pipeline.WorkFlow.yaml
+          hash: 2b97dfac
+        kind: Workflow
+      - identifier:
+          externalId: icapi_trigger
+        source:
+          path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/workflows/wf_icapi_data_pipeline.WorkFlowTrigger.yaml
+          hash: 4bb02ead
+        kind: WorkflowTrigger
+      - identifier:
+          workflowExternalId: wf_icapi_data_pipeline
+          version: '1'
+        source:
+          path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/workflows/wf_icapi_data_pipeline.WorkflowVersion.yaml
+          hash: 6de13d92
+        kind: WorkflowVersion
       functions:
       - identifier:
           externalId: icapi_datapoints_extractor
@@ -267,7 +294,7 @@ modules:
           externalId: contextualize_ts_assets
         source:
           path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/transformations/contextualize_ts_assets.Transformation.yaml
-          hash: 26b9d231
+          hash: 033d0b19
         kind: Transformation
         extra_sources:
         - path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/transformations/contextualize_ts_assets.Transformation.sql
@@ -287,6 +314,6 @@ modules:
           path: /workspaces/ice-cream-dataops/ice-cream-dataops/modules/bootcamp/ice_cream_api/transformations/create_asset_hierarchy.schedule.yaml
           hash: 259da560
         kind: Schedule
-    warning_count: 2
+    warning_count: 3
     status: Success
     iteration: 1
